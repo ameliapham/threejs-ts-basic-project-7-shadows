@@ -10,12 +10,32 @@ const canvas = document.querySelector("canvas.webgl") as HTMLCanvasElement;
 const scene = new THREE.Scene();
 
 // --- Setup Axes Helper ---
-const axesHelper = new THREE.AxesHelper(2)
-scene.add(axesHelper)
+ const axesHelper = new THREE.AxesHelper(2)
+ scene.add(axesHelper)
+
+// --- Objects ---
+const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI),
+    new THREE.MeshStandardMaterial()
+)
+scene.add(sphere)
+
+const plane = new THREE.Mesh(
+    new THREE.PlaneGeometry(12, 12, 1, 1)
+)
+plane.rotation.x = - Math.PI/2
+plane.position.y = -3
+scene.add(plane)
+
+// --- Light ---
+const ambientLight = new THREE.AmbientLight(0xffffff, 1)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+
+scene.add(ambientLight, directionalLight)
 
 // --- Camera Setup ---
 const camera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight);
-camera.position.z = 3
+camera.position.z = 8
 scene.add(camera)
 
 // --- Controls ---
