@@ -12,6 +12,7 @@ const scene = new THREE.Scene();
 
 // --- Setup Axes Helper ---
  const axesHelper = new THREE.AxesHelper(2)
+ axesHelper.visible = false
  scene.add(axesHelper)
 
 // --- Objects ---
@@ -50,16 +51,23 @@ directionalLight.shadow.camera.near = 1
 directionalLight.shadow.camera.far = 10
 
 const directionalLightCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
+directionalLightCameraHelper.visible = false
 scene.add(directionalLightCameraHelper)
 
 // --- Lights Helpers ---
 const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
+directionalLightHelper.visible = false
 scene.add(directionalLightHelper)
 
 // --- Debug UI ---
 const gui = new GUI
 gui.add(ambientLight, "intensity").min(0).max(5).step(0.01).name("Ambient Light Intensity")
 gui.add(directionalLight, "intensity").min(0).max(5).step(0.01).name("Directional Light Intensity")
+
+const helpers = gui.addFolder("Helpers")
+helpers.add(axesHelper, 'visible').name("Axes Helper")
+helpers.add(directionalLightHelper, 'visible').name("Directional Light Helper")
+helpers.add(directionalLightCameraHelper, 'visible').name("Directional Light Camera Helper")
 
 // --- Camera Setup ---
 const camera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight);
