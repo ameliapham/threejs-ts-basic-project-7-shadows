@@ -19,7 +19,7 @@ const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI),
     new THREE.MeshStandardMaterial()
 )
-scene.add(sphere)
+sphere.castShadow = true
 
 const plane = new THREE.Mesh(
     new THREE.PlaneGeometry(12, 12, 1, 1),
@@ -27,18 +27,26 @@ const plane = new THREE.Mesh(
 )
 plane.rotation.x = - Math.PI/2
 plane.position.y = -3
-scene.add(plane)
+plane.receiveShadow = true
+
+scene.add(sphere, plane)
 
 // --- Light ---
 const ambientLight = new THREE.AmbientLight(0xffffff, 1)
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+directionalLight.position.set(2, 2, -1)
+directionalLight.castShadow = true
 
 scene.add(ambientLight, directionalLight)
 
+// --- Lights Helpers ---
+const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
+scene.add(directionalLightHelper)
+
 // --- Debug UI ---
 const gui = new GUI
-gui.add(ambientLight, "intensity").min(0).max(10).step(0.01).name("Ambient Light Intensity")
-gui.add(directionalLight, "intensity").min(0).max(10).step(0.01).name("Directional Light Intensity")
+gui.add(ambientLight, "intensity").min(0).max(5).step(0.01).name("Ambient Light Intensity")
+gui.add(directionalLight, "intensity").min(0).max(5).step(0.01).name("Directional Light Intensity")
 
 // --- Camera Setup ---
 const camera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight);
@@ -53,6 +61,7 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.shadowMap.enabled = true
 
 // --- Resize ---
 window.addEventListener("resize", () => {
