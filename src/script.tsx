@@ -15,6 +15,9 @@ const scene = new THREE.Scene();
  axesHelper.visible = false
  scene.add(axesHelper)
 
+// --- Texture ---
+const simpleShadow = new THREE.TextureLoader().load("/public/texture/simpleShadow.jpg")
+
 // --- Objects ---
 const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI),
@@ -32,6 +35,19 @@ plane.receiveShadow = true
 
 scene.add(sphere, plane)
 
+const sphereShadow = new THREE.Mesh(
+    new THREE.PlaneGeometry(3, 3),
+    new THREE.MeshBasicMaterial({
+        color : "black",
+        transparent : true,
+        opacity: 0.5,
+        alphaMap : simpleShadow
+    })
+)
+sphereShadow.rotation.x = - Math.PI/2
+sphereShadow.position.y = plane.position.y + 0.01
+scene.add(sphereShadow)
+
 // --- Light ---
 // Ambient Light
 const ambientLight = new THREE.AmbientLight(0xffffff, 1)
@@ -41,7 +57,6 @@ scene.add(ambientLight)
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
 directionalLight.position.set(2, 2, -1)
 directionalLight.castShadow = true
-scene.add(directionalLight)
 
 directionalLight.shadow.mapSize.width = 1024/2
 directionalLight.shadow.mapSize.height = 1024/2
@@ -55,6 +70,8 @@ directionalLight.shadow.camera.far = 10
 
 //directionalLight.shadow.radius = 50
 
+scene.add(directionalLight)
+
 // Spot Light
 const spotLight = new THREE.SpotLight(0xffffff, 10, 10, Math.PI* 0.3)
 spotLight.position.set(-3, 2, -2)
@@ -66,8 +83,8 @@ spotLight.shadow.mapSize.height = 1024;
 spotLight.shadow.camera.near = 0.1;
 spotLight.shadow.camera.far = 10;
 
-scene.add(spotLight)
-scene.add(spotLight.target)
+// scene.add(spotLight)
+// scene.add(spotLight.target)
 
 // Point Light
 const pointLight = new THREE.PointLight(0xffffff, 5, 0, 2)
@@ -79,7 +96,7 @@ pointLight.shadow.mapSize.height = 1024
 pointLight.shadow.camera.near = 0.1
 pointLight.shadow.camera.far = 5
 
-scene.add(pointLight)
+// scene.add(pointLight)
 
 // --- Lights Helpers ---
 const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
@@ -105,6 +122,7 @@ scene.add(pointLightHelper, pointLightCameraHelper)
 
 // --- Debug UI ---
 const gui = new GUI
+gui.close()
 gui.add(ambientLight, "intensity").min(0).max(5).step(0.01).name("Ambient Light Intensity")
 gui.add(directionalLight, "intensity").min(0).max(5).step(0.01).name("Directional Light Intensity")
 gui.add(spotLight, 'intensity').min(0).max(20).step(0.01).name("Spot Light Intensity")
@@ -119,8 +137,6 @@ helpers.add(spotLightCameraHelper, 'visible').name("Spot Light Camera Helper")
 helpers.add(pointLightHelper, 'visible').name("Point Light Helper")
 helpers.add(pointLightCameraHelper, 'visible').name("Point Light Camera Helper")
 
-
-
 // --- Camera Setup ---
 const camera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight);
 camera.position.z = 8
@@ -134,7 +150,7 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.shadowMap.enabled = true
+renderer.shadowMap.enabled = false
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 // --- Resize ---
