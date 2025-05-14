@@ -33,12 +33,15 @@ plane.receiveShadow = true
 scene.add(sphere, plane)
 
 // --- Light ---
+// Ambient Light
 const ambientLight = new THREE.AmbientLight(0xffffff, 1)
+scene.add(ambientLight)
+
+// Directional Light
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
 directionalLight.position.set(2, 2, -1)
 directionalLight.castShadow = true
-
-scene.add(ambientLight, directionalLight)
+scene.add(directionalLight)
 
 directionalLight.shadow.mapSize.width = 1024/2
 directionalLight.shadow.mapSize.height = 1024/2
@@ -52,24 +55,48 @@ directionalLight.shadow.camera.far = 10
 
 //directionalLight.shadow.radius = 50
 
-const directionalLightCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
-directionalLightCameraHelper.visible = false
-scene.add(directionalLightCameraHelper)
+// Spot Light
+const spotLight = new THREE.SpotLight(0xffffff, 10, 10, Math.PI* 0.3)
+spotLight.position.set(-3, 2, -2)
+spotLight.target.position.set(0, 0, 0);
+spotLight.castShadow = true
+
+spotLight.shadow.mapSize.width = 1024;
+spotLight.shadow.mapSize.height = 1024;
+spotLight.shadow.camera.near = 0.1;
+spotLight.shadow.camera.far = 10;
+
+scene.add(spotLight)
+scene.add(spotLight.target)
+
 
 // --- Lights Helpers ---
 const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
 directionalLightHelper.visible = false
-scene.add(directionalLightHelper)
+
+const directionalLightCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
+directionalLightCameraHelper.visible = false
+scene.add(directionalLightHelper, directionalLightCameraHelper)
+
+const spotLightHelper = new THREE.SpotLightHelper(spotLight, 0.2)
+spotLightHelper.visible = false
+
+const spotLightCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera)
+spotLightCameraHelper.visible = false
+scene.add(spotLightHelper, spotLightCameraHelper)
 
 // --- Debug UI ---
 const gui = new GUI
 gui.add(ambientLight, "intensity").min(0).max(5).step(0.01).name("Ambient Light Intensity")
 gui.add(directionalLight, "intensity").min(0).max(5).step(0.01).name("Directional Light Intensity")
+gui.add(spotLight, 'intensity').min(0).max(20).step(0.01).name("Spot Light Intensity")
 
 const helpers = gui.addFolder("Helpers")
 helpers.add(axesHelper, 'visible').name("Axes Helper")
 helpers.add(directionalLightHelper, 'visible').name("Directional Light Helper")
 helpers.add(directionalLightCameraHelper, 'visible').name("Directional Light Camera Helper")
+helpers.add(spotLightHelper, 'visible').name("Spot Light Helper")
+helpers.add(spotLightCameraHelper, 'visible').name("Spot Light Camera Helper")
 
 // --- Camera Setup ---
 const camera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight);
