@@ -27,7 +27,7 @@ const plane = new THREE.Mesh(
     new THREE.MeshStandardMaterial()
 )
 plane.rotation.x = - Math.PI/2
-plane.position.y = -3
+plane.position.y = -1
 plane.receiveShadow = true
 
 scene.add(sphere, plane)
@@ -40,8 +40,8 @@ directionalLight.castShadow = true
 
 scene.add(ambientLight, directionalLight)
 
-directionalLight.shadow.mapSize.width = 1024
-directionalLight.shadow.mapSize.height = 1024
+directionalLight.shadow.mapSize.width = 1024/2
+directionalLight.shadow.mapSize.height = 1024/2
 directionalLight.shadow.camera.top = 2
 directionalLight.shadow.camera.right = 2
 directionalLight.shadow.camera.bottom = -2
@@ -50,7 +50,7 @@ directionalLight.shadow.camera.left = -2
 directionalLight.shadow.camera.near = 1
 directionalLight.shadow.camera.far = 10
 
-directionalLight.shadow.radius = 50
+//directionalLight.shadow.radius = 50
 
 const directionalLightCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
 directionalLightCameraHelper.visible = false
@@ -85,6 +85,7 @@ const renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 // --- Resize ---
 window.addEventListener("resize", () => {
