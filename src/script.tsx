@@ -23,6 +23,7 @@ const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI),
     new THREE.MeshStandardMaterial()
 )
+sphere.position.y = 1
 sphere.castShadow = true
 
 const plane = new THREE.Mesh(
@@ -40,7 +41,6 @@ const sphereShadow = new THREE.Mesh(
     new THREE.MeshBasicMaterial({
         color : "black",
         transparent : true,
-        opacity: 0.5,
         alphaMap : simpleShadow
     })
 )
@@ -161,9 +161,29 @@ window.addEventListener("resize", () => {
 })
 
 // --- Render Loop ---
+const clock = new THREE.Clock()
+
 function animate(){
+    // Clock
+    const elapsedTime = clock.getElapsedTime()
+
+    // Update the sphere
+    sphere.position.x = Math.cos(elapsedTime) * 3
+    sphere.position.z = Math.sin(elapsedTime) * 3
+    sphere.position.y = Math.abs(Math.sin(elapsedTime * 4))
+
+    // Update the shadow
+    sphereShadow.position.x = sphere.position.x
+    sphereShadow.position.z = sphere.position.z
+    sphereShadow.material.opacity = (1 - sphere.position.y) * 0.3
+
+    // Update control
     controls.update()
+
+    // Update render
     renderer.render(scene, camera);
+
+    // Call animate again on the next frame
     window.requestAnimationFrame(animate)
 }
 animate()
