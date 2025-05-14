@@ -60,15 +60,16 @@ directionalLight.castShadow = true
 
 directionalLight.shadow.mapSize.width = 1024/2
 directionalLight.shadow.mapSize.height = 1024/2
-directionalLight.shadow.camera.top = 2
-directionalLight.shadow.camera.right = 2
-directionalLight.shadow.camera.bottom = -2
-directionalLight.shadow.camera.left = -2
+directionalLight.shadow.camera.top = 5
+directionalLight.shadow.camera.right = 5
+directionalLight.shadow.camera.bottom = -5
+directionalLight.shadow.camera.left = -5
 
 directionalLight.shadow.camera.near = 1
 directionalLight.shadow.camera.far = 10
+directionalLight.shadow.camera.updateProjectionMatrix()
 
-//directionalLight.shadow.radius = 50
+directionalLight.shadow.radius = 50
 
 scene.add(directionalLight)
 
@@ -77,26 +78,28 @@ const spotLight = new THREE.SpotLight(0xffffff, 10, 10, Math.PI* 0.3)
 spotLight.position.set(-3, 2, -2)
 spotLight.target.position.set(0, 0, 0);
 spotLight.castShadow = true
+spotLight.visible = false
 
 spotLight.shadow.mapSize.width = 1024;
 spotLight.shadow.mapSize.height = 1024;
 spotLight.shadow.camera.near = 0.1;
 spotLight.shadow.camera.far = 10;
 
-// scene.add(spotLight)
-// scene.add(spotLight.target)
+scene.add(spotLight)
+scene.add(spotLight.target)
 
 // Point Light
 const pointLight = new THREE.PointLight(0xffffff, 5, 0, 2)
 pointLight.position.set(-1, 3, 0)
 pointLight.castShadow = true
+pointLight.visible = false
 
 pointLight.shadow.mapSize.width = 1024
 pointLight.shadow.mapSize.height = 1024
 pointLight.shadow.camera.near = 0.1
-pointLight.shadow.camera.far = 5
+pointLight.shadow.camera.far = 10
 
-// scene.add(pointLight)
+scene.add(pointLight)
 
 // --- Lights Helpers ---
 const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
@@ -120,23 +123,6 @@ const pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera)
 pointLightCameraHelper.visible = false
 scene.add(pointLightHelper, pointLightCameraHelper)
 
-// --- Debug UI ---
-const gui = new GUI
-gui.close()
-gui.add(ambientLight, "intensity").min(0).max(5).step(0.01).name("Ambient Light Intensity")
-gui.add(directionalLight, "intensity").min(0).max(5).step(0.01).name("Directional Light Intensity")
-gui.add(spotLight, 'intensity').min(0).max(20).step(0.01).name("Spot Light Intensity")
-gui.add(pointLight, 'intensity').min(0).max(20).step(0.01).name("Point Light Intensity")
-
-const helpers = gui.addFolder("Helpers")
-helpers.add(axesHelper, 'visible').name("Axes Helper")
-helpers.add(directionalLightHelper, 'visible').name("Directional Light Helper")
-helpers.add(directionalLightCameraHelper, 'visible').name("Directional Light Camera Helper")
-helpers.add(spotLightHelper, 'visible').name("Spot Light Helper")
-helpers.add(spotLightCameraHelper, 'visible').name("Spot Light Camera Helper")
-helpers.add(pointLightHelper, 'visible').name("Point Light Helper")
-helpers.add(pointLightCameraHelper, 'visible').name("Point Light Camera Helper")
-
 // --- Camera Setup ---
 const camera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight);
 camera.position.z = 8
@@ -150,8 +136,40 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.shadowMap.enabled = false
+renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+// --- Debug UI ---
+const gui = new GUI
+gui.close()
+gui.add(ambientLight, "intensity").min(0).max(5).step(0.01).name("Ambient Light Intensity")
+gui.add(axesHelper, 'visible').name("Axes Helper")
+gui.add(sphereShadow, 'visible').name('Enable Baking Shadow')
+gui.add(renderer.shadowMap, 'enabled')
+    .name("Enable Real Shadows")
+    .onChange(() => {
+        directionalLight.castShadow = renderer.shadowMap.enabled
+        spotLight.castShadow = renderer.shadowMap.enabled
+        pointLight.castShadow = renderer.shadowMap.enabled
+    })
+
+const directionalLightShadow = gui.addFolder("Directional Light")
+directionalLightShadow.add(directionalLight, 'visible').name("Directional Light")
+directionalLightShadow.add(directionalLight, "intensity").min(0).max(5).step(0.01).name("Directional Light Intensity")
+directionalLightShadow.add(directionalLightHelper, 'visible').name("Directional Light Helper")
+directionalLightShadow.add(directionalLightCameraHelper, 'visible').name("Directional Light Camera Helper")
+
+const spotLightShadow = gui.addFolder("Spot Light")
+spotLightShadow.add(spotLight, 'visible').name("Spot Light")
+spotLightShadow.add(spotLight, 'intensity').min(0).max(20).step(0.01).name("Spot Light Intensity")
+spotLightShadow.add(spotLightHelper, 'visible').name("Spot Light Helper")
+spotLightShadow.add(spotLightCameraHelper, 'visible').name("Spot Light Camera Helper")
+
+const pointLightShadow = gui.addFolder("Point Light")
+pointLightShadow.add(pointLight, 'visible').name("Point Light")
+pointLightShadow.add(pointLight, 'intensity').min(0).max(20).step(0.01).name("Point Light Intensity")
+pointLightShadow.add(pointLightHelper, 'visible').name("Point Light Helper")
+pointLightShadow.add(pointLightCameraHelper, 'visible').name("Point Light Camera Helper")
 
 // --- Resize ---
 window.addEventListener("resize", () => {
