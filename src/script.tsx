@@ -69,6 +69,17 @@ spotLight.shadow.camera.far = 10;
 scene.add(spotLight)
 scene.add(spotLight.target)
 
+// Point Light
+const pointLight = new THREE.PointLight(0xffffff, 5, 0, 2)
+pointLight.position.set(-1, 3, 0)
+pointLight.castShadow = true
+
+pointLight.shadow.mapSize.width = 1024
+pointLight.shadow.mapSize.height = 1024
+pointLight.shadow.camera.near = 0.1
+pointLight.shadow.camera.far = 5
+
+scene.add(pointLight)
 
 // --- Lights Helpers ---
 const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
@@ -85,11 +96,19 @@ const spotLightCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera)
 spotLightCameraHelper.visible = false
 scene.add(spotLightHelper, spotLightCameraHelper)
 
+const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.2)
+pointLightHelper.visible = false
+
+const pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera)
+pointLightCameraHelper.visible = false
+scene.add(pointLightHelper, pointLightCameraHelper)
+
 // --- Debug UI ---
 const gui = new GUI
 gui.add(ambientLight, "intensity").min(0).max(5).step(0.01).name("Ambient Light Intensity")
 gui.add(directionalLight, "intensity").min(0).max(5).step(0.01).name("Directional Light Intensity")
 gui.add(spotLight, 'intensity').min(0).max(20).step(0.01).name("Spot Light Intensity")
+gui.add(pointLight, 'intensity').min(0).max(20).step(0.01).name("Point Light Intensity")
 
 const helpers = gui.addFolder("Helpers")
 helpers.add(axesHelper, 'visible').name("Axes Helper")
@@ -97,6 +116,10 @@ helpers.add(directionalLightHelper, 'visible').name("Directional Light Helper")
 helpers.add(directionalLightCameraHelper, 'visible').name("Directional Light Camera Helper")
 helpers.add(spotLightHelper, 'visible').name("Spot Light Helper")
 helpers.add(spotLightCameraHelper, 'visible').name("Spot Light Camera Helper")
+helpers.add(pointLightHelper, 'visible').name("Point Light Helper")
+helpers.add(pointLightCameraHelper, 'visible').name("Point Light Camera Helper")
+
+
 
 // --- Camera Setup ---
 const camera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight);
